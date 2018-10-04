@@ -1,75 +1,86 @@
 import * as React from 'react';
 import * as classNames from 'classnames';
+import { TodoTextInput } from 'app/components/TodoTextInput';
+import { TodoModel } from 'app/models/TodoModel';
 import * as style from './style.css';
-import { TodoModel } from 'app/models';
-import { TodoActions } from 'app/actions';
-import { TodoTextInput } from '../TodoTextInput';
 
-export namespace TodoItem {
-  export interface Props {
-    todo: TodoModel;
-    editTodo: typeof TodoActions.editTodo;
-    deleteTodo: typeof TodoActions.deleteTodo;
-    completeTodo: typeof TodoActions.completeTodo;
-  }
-
-  export interface State {
-    editing: boolean;
-  }
+export interface TodoActions {
+  editTodo: (id: number, data: Partial<TodoModel>) => any;
+  deleteTodo: (id: number) => any;
 }
 
-export class TodoItem extends React.Component<TodoItem.Props, TodoItem.State> {
-  constructor(props: TodoItem.Props, context?: any) {
+export interface TodoProps extends TodoActions {
+  todo: TodoModel;
+}
+
+export interface TodoState {
+  editing: boolean;
+}
+
+export class TodoItem extends React.Component<TodoProps, TodoState> {
+  constructor(props?: TodoProps, context?: any) {
     super(props, context);
     this.state = { editing: false };
   }
 
-  handleDoubleClick() {
+  private handleDoubleClick = (e: React.SyntheticEvent<any>) => {
     this.setState({ editing: true });
-  }
+  };
 
-  handleSave(id: number, text: string) {
-    if (text.length === 0) {
-      this.props.deleteTodo(id);
+  private handleToggleCheckbox = (e: React.SyntheticEvent<any>) => {
+    const { todo } = this.props;
+    const target = e.target as any;
+    if (
+      target &&
+      target.checked !== undefined &&
+      target.checked !== todo.completed
+    ) {
+      this.updateTodo({ completed: target.checked });
+    }
+  };
+
+  private handleClickDeleteButton = (e: React.SyntheticEvent<any>) => {
+    const { todo, deleteTodo } = this.props;
+    deleteTodo(todo.id);
+  };
+
+  private updateTodo = (data: Partial<TodoModel>) => {
+    const { todo } = this.props;
+    if (data.text !== undefined && data.text.trim().length === 0) {
+      this.props.deleteTodo(todo.id);
     } else {
-      this.props.editTodo({ id, text });
+      this.props.editTodo(todo.id, data);
     }
     this.setState({ editing: false });
-  }
+  };
 
   render() {
-    const { todo, completeTodo, deleteTodo } = this.props;
+    const { todo } = this.props;
 
-    let element;
-    if (this.state.editing) {
-      element = (
-        <TodoTextInput
-          text={todo.text}
-          editing={this.state.editing}
-          onSave={(text) => todo.id && this.handleSave(todo.id, text)}
+    const element = this.state.editing ? (
+      <TodoTextInput
+        text={todo.text}
+        editing={this.state.editing}
+        onSave={(text) => this.updateTodo({ text })}
+      />
+    ) : (
+      <div className={style.view}>
+        <input
+          className={style.toggle}
+          type="checkbox"
+          checked={todo.completed}
+          onChange={this.handleToggleCheckbox}
         />
-      );
-    } else {
-      element = (
-        <div className={style.view}>
-          <input
-            className={style.toggle}
-            type="checkbox"
-            checked={todo.completed}
-            onChange={() => todo.id && completeTodo(todo.id)}
-          />
-          <label onDoubleClick={() => this.handleDoubleClick()}>{todo.text}</label>
-          <button
-            className={style.destroy}
-            onClick={() => {
-              if (todo.id) deleteTodo(todo.id);
-            }}
-          />
-        </div>
-      );
-    }
 
-    // TODO: compose
+        <label onDoubleClick={this.handleDoubleClick}>{todo.text}</label>
+
+        <button
+          className={style.destroy}
+          onClick={this.handleClickDeleteButton}
+        />
+      </div>
+    );
+
     const classes = classNames({
       [style.completed]: todo.completed,
       [style.editing]: this.state.editing,
@@ -79,3 +90,5 @@ export class TodoItem extends React.Component<TodoItem.Props, TodoItem.State> {
     return <li className={classes}>{element}</li>;
   }
 }
+
+export default TodoItem;

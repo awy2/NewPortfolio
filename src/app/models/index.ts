@@ -1,1 +1,3 @@
-export * from './TodoModel';
+import TodoModel from './TodoModel';
+
+export { TodoModel };

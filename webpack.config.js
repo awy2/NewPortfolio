@@ -2,19 +2,19 @@ var webpack = require('webpack');
 var path = require('path');
 
 // variables
-var isProduction = process.argv.indexOf('-p') >= 0 || process.env.NODE_ENV === 'production';
+var isProduction = process.argv.indexOf('-p') >= 0;
 var sourcePath = path.join(__dirname, './src');
 var outPath = path.join(__dirname, './dist');
 
 // plugins
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var MiniCssExtractPlugin = require('mini-css-extract-plugin');
+var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var WebpackCleanupPlugin = require('webpack-cleanup-plugin');
 
 module.exports = {
   context: sourcePath,
   entry: {
-    app: './main.tsx'
+    main: './main.tsx'
   },
   output: {
     path: outPath,
@@ -29,7 +29,7 @@ module.exports = {
     // (jsnext:main directs not usually distributable es6 format, but es6 sources)
     mainFields: ['module', 'browser', 'main'],
     alias: {
-      app: path.resolve(__dirname, 'src/app/')
+      'app': path.resolve(__dirname, 'src/app/')
     }
   },
   module: {
@@ -37,52 +37,47 @@ module.exports = {
       // .ts, .tsx
       {
         test: /\.tsx?$/,
-        use: [
-          !isProduction && {
-            loader: 'babel-loader',
-            options: { plugins: ['react-hot-loader/babel'] }
-          },
-          'ts-loader'
-        ].filter(Boolean)
+        use: isProduction
+          ? 'ts-loader'
+          : ['babel-loader?plugins=react-hot-loader/babel', 'ts-loader']
       },
       // css
       {
         test: /\.css$/,
-        use: [
-          isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
-          {
-            loader: 'css-loader',
-            query: {
-              modules: true,
-              sourceMap: !isProduction,
-              importLoaders: 1,
-              localIdentName: isProduction ? '[hash:base64:5]' : '[local]__[hash:base64:5]'
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            {
+              loader: 'css-loader',
+              query: {
+                modules: true,
+                sourceMap: !isProduction,
+                importLoaders: 1,
+                localIdentName: '[local]__[hash:base64:5]'
+              }
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                ident: 'postcss',
+                plugins: [
+                  require('postcss-import')({ addDependencyTo: webpack }),
+                  require('postcss-url')(),
+                  require('postcss-cssnext')(),
+                  require('postcss-reporter')(),
+                  require('postcss-browser-reporter')({
+                    disabled: isProduction
+                  })
+                ]
+              }
             }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              ident: 'postcss',
-              plugins: [
-                require('postcss-import')({ addDependencyTo: webpack }),
-                require('postcss-url')(),
-                require('postcss-preset-env')({
-                  /* use stage 2 features (defaults) */
-                  stage: 2,
-                }),
-                require('postcss-reporter')(),
-                require('postcss-browser-reporter')({
-                  disabled: isProduction
-                })
-              ]
-            }
-          }
-        ]
+          ]
+        })
       },
       // static assets
       { test: /\.html$/, use: 'html-loader' },
-      { test: /\.(a?png|svg)$/, use: 'url-loader?limit=10000' },
-      { test: /\.(jpe?g|gif|bmp|mp3|mp4|ogg|wav|eot|ttf|woff|woff2)$/, use: 'file-loader' }
+      { test: /\.png$/, use: 'url-loader?limit=10000' },
+      { test: /\.jpg$/, use: 'file-loader' }
     ]
   },
   optimization: {
@@ -103,13 +98,9 @@ module.exports = {
     runtimeChunk: true
   },
   plugins: [
-    new webpack.EnvironmentPlugin({
-      NODE_ENV: 'development', // use 'development' unless process.env.NODE_ENV is defined
-      DEBUG: false
-    }),
     new WebpackCleanupPlugin(),
-    new MiniCssExtractPlugin({
-      filename: '[contenthash].css',
+    new ExtractTextPlugin({
+      filename: 'styles.css',
       disable: !isProduction
     }),
     new HtmlWebpackPlugin({
@@ -123,11 +114,9 @@ module.exports = {
     historyApiFallback: {
       disableDotRule: true
     },
-    stats: 'minimal',
-    clientLogLevel: 'warning'
+    stats: 'minimal'
   },
-  // https://webpack.js.org/configuration/devtool/
-  devtool: isProduction ? 'hidden-source-map' : 'cheap-module-eval-source-map',
+  devtool: 'cheap-module-eval-source-map',
   node: {
     // workaround for webpack-dev-server issue
     // https://github.com/webpack/webpack-dev-server/issues/60#issuecomment-103411179

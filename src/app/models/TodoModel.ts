@@ -1,15 +1,20 @@
-/** TodoMVC model definitions **/
+import { observable } from 'mobx';
 
-export interface TodoModel {
-  id: number;
-  text: string;
-  completed: boolean;
-}
+export class TodoModel {
+  readonly id: number;
+  @observable public text: string;
+  @observable public completed: boolean;
 
-export namespace TodoModel {
-  export enum Filter {
-    SHOW_ALL = 'all',
-    SHOW_ACTIVE = 'active',
-    SHOW_COMPLETED = 'completed'
+  constructor(text: string, completed: boolean = false) {
+    this.id = TodoModel.generateId();
+    this.text = text;
+    this.completed = completed;
+  }
+
+  static nextId = 1;
+  static generateId() {
+    return this.nextId++;
   }
 }
+
+export default TodoModel;

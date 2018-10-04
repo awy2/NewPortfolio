@@ -1,20 +1,29 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { ConnectedRouter } from 'react-router-redux';
+import { useStrict } from 'mobx';
+import { Provider } from 'mobx-react';
 import { createBrowserHistory } from 'history';
-import { configureStore } from 'app/store';
-import { App } from './app';
+import { TodoModel } from 'app/models';
+import { createStores } from 'app/stores';
+import { App } from 'app';
 
-// prepare store
+// enable MobX strict mode
+useStrict(true);
+
+// default fixtures for TodoStore
+const defaultTodos = [
+  new TodoModel('Use Mobx'),
+  new TodoModel('Use React', true)
+];
+
+// prepare MobX stores
 const history = createBrowserHistory();
-const store = configureStore(history);
+const rootStore = createStores(history, defaultTodos);
 
+// render react DOM
 ReactDOM.render(
-  <Provider store={store}>
-    <ConnectedRouter history={history}>
-      <App />
-    </ConnectedRouter>
+  <Provider {...rootStore}>
+    <App history={history} />
   </Provider>,
   document.getElementById('root')
 );

@@ -1,31 +1,26 @@
 import * as React from 'react';
-import * as style from './style.css';
 import * as classNames from 'classnames';
-import { TodoModel } from 'app/models';
+import * as style from './style.css';
+import {
+  TodoFilter,
+  TODO_FILTER_TITLES,
+  TODO_FILTER_TYPES
+} from 'app/constants';
 
-export const FILTER_TITLES = {
-  [TodoModel.Filter.SHOW_ALL]: 'All',
-  [TodoModel.Filter.SHOW_ACTIVE]: 'Active',
-  [TodoModel.Filter.SHOW_COMPLETED]: 'Completed'
-};
-
-export namespace Footer {
-  export interface Props {
-    filter: TodoModel.Filter;
-    activeCount?: number;
-    completedCount?: number;
-    onClickFilter: (filter: TodoModel.Filter) => any;
-    onClickClearCompleted: () => any;
-  }
+export interface FooterProps {
+  filter: TodoFilter;
+  activeCount: number;
+  completedCount: number;
+  onChangeFilter: (filter: TodoFilter) => any;
+  onClearCompleted: () => any;
 }
 
-export class Footer extends React.Component<Footer.Props> {
-  static defaultProps: Partial<Footer.Props> = {
-    activeCount: 0,
-    completedCount: 0
-  };
+export interface FooterState {
+  /* empty */
+}
 
-  renderTodoCount(): JSX.Element {
+export class Footer extends React.Component<FooterProps, FooterState> {
+  renderTodoCount() {
     const { activeCount } = this.props;
     const itemWord = activeCount === 1 ? 'item' : 'items';
 
@@ -36,28 +31,29 @@ export class Footer extends React.Component<Footer.Props> {
     );
   }
 
-  renderFilterLink(filter: TodoModel.Filter): JSX.Element {
-    const { filter: selectedFilter, onClickFilter } = this.props;
+  renderFilterLink(filter: TodoFilter) {
+    const title = TODO_FILTER_TITLES[filter];
+    const { filter: selectedFilter, onChangeFilter } = this.props;
+    const className = classNames({
+      [style.selected]: filter === selectedFilter
+    });
 
     return (
       <a
-        className={classNames({ [style.selected]: filter === selectedFilter })}
+        className={className}
         style={{ cursor: 'pointer' }}
-        onClick={() => onClickFilter(filter)}
-        children={FILTER_TITLES[filter]}
-      />
+        onClick={() => onChangeFilter(filter)}
+      >
+        {title}
+      </a>
     );
   }
 
-  renderClearButton(): JSX.Element | void {
-    const { completedCount, onClickClearCompleted } = this.props;
-    if (completedCount! > 0) {
+  renderClearButton() {
+    const { completedCount, onClearCompleted } = this.props;
+    if (completedCount > 0) {
       return (
-        <button
-          className={style.clearCompleted}
-          onClick={onClickClearCompleted}
-          children={'Clear completed'}
-        />
+        <button className={style.clearCompleted} onClick={onClearCompleted} />
       );
     }
   }
@@ -67,8 +63,8 @@ export class Footer extends React.Component<Footer.Props> {
       <footer className={style.normal}>
         {this.renderTodoCount()}
         <ul className={style.filters}>
-          {(Object.keys(TodoModel.Filter) as (keyof typeof TodoModel.Filter)[]).map((key) => (
-            <li key={key} children={this.renderFilterLink(TodoModel.Filter[key])} />
+          {TODO_FILTER_TYPES.map((filter) => (
+            <li key={filter} children={this.renderFilterLink(filter)} />
           ))}
         </ul>
         {this.renderClearButton()}
@@ -76,3 +72,5 @@ export class Footer extends React.Component<Footer.Props> {
     );
   }
 }
+
+export default Footer;

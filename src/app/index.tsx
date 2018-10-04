@@ -1,10 +1,20 @@
 import * as React from 'react';
-import { Route, Switch } from 'react-router';
-import { App as TodoApp } from 'app/containers/App';
 import { hot } from 'react-hot-loader';
+import { Router, Route, Switch } from 'react-router';
+import { Root } from 'app/containers/Root';
+import { TodoApp } from 'app/containers/TodoApp';
+import { Display } from 'app/containers/Display';
 
-export const App = hot(module)(() => (
-  <Switch>
-    <Route path="/" component={TodoApp} />
-  </Switch>
+
+// render react DOM
+export const App = hot(module)(({ history }) => (
+  <Root>
+    <Router history={history}>
+      <Switch>
+        <Route path="/" component={TodoApp} />
+      </Switch>
+    </Router>
+    <Display />
+
+  </Root>
 ));
