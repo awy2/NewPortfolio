@@ -20,5 +20,8 @@
       "app/*": ["./app/*"]
     }
   },
-  "exclude": ["dist", "build", "node_modules"]
+  "exclude": ["dist", 
+              "build", 
+              "node_modules"
+            ]
 }
