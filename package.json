@@ -1,5 +1,5 @@
 {
-  "name": "Andrew Yip",
+  "name": "andrew_yip",
   "version": "0.0.1",
   "private": true,
   "description": "A personal website",
@@ -40,7 +40,7 @@
     "url-loader": "^1.0.0-beta.0",
     "webpack": "^4.0.1",
     "webpack-cleanup-plugin": "^0.5.1",
-    "webpack-cli": "2.0.10",
+    "webpack-cli": "2.0.08",
     "webpack-dev-server": "^3.1.0",
     "webpack-hot-middleware": "^2.21.1"
   },

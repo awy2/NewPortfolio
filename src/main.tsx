@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { useStrict } from 'mobx';
 import { Provider } from 'mobx-react';
 import { createBrowserHistory } from 'history';
-import { TodoModel } from 'app/models';
+import { TodoModel, ApplicationModel } from 'app/models';
 import { createStores } from 'app/stores';
 import { App } from 'app';
 
@@ -16,9 +16,13 @@ const defaultTodos = [
   new TodoModel('Use React', true)
 ];
 
+const defaultApplication = [
+  new ApplicationModel('Terminal')
+];
+
 // prepare MobX stores
 const history = createBrowserHistory();
-const rootStore = createStores(history, defaultTodos);
+const rootStore = createStores(history, defaultTodos, defaultApplication);
 
 // render react DOM
 ReactDOM.render(

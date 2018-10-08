@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { inject, observer } from 'mobx-react';
 import {
 	DropTarget,
 	DragDropContext,
@@ -11,6 +12,10 @@ import HTML5Backend from 'react-dnd-html5-backend';
 //import ItemTypes from 'types/ItemTypes';
 import ApplicationWindow from 'app/components/ApplicationWindow';
 
+import { ApplicationStore } from 'app/stores';
+import {
+	STORE_APPLICATION,
+} from 'app/constants';
 
 const update = require('immutability-helper')
 
@@ -48,6 +53,8 @@ export interface DisplayState {
 	boxes: { [key: string]: { top: number; left: number; title: string } }
 }
 
+@inject(STORE_APPLICATION)
+@observer
 @DragDropContext(HTML5Backend)
 @DropTarget('box', //ItemTypes.BOX, 
     boxTarget, (connect: any) => ({
@@ -59,11 +66,21 @@ DisplayState
 > {
 	constructor(props: DisplayProps) {
 		super(props)
+
+		const applications = this.props[STORE_APPLICATION] as ApplicationStore;
+
+		let boxes = {
+			a: { top: 20, left: 80, title: 'Drag me around' },
+			b: { top: 180, left: 20, title: 'Drag me too' },
+		}
+
+		applications.todos.forEach(element => {
+			boxes[element.id] = { top: 40, left: 60, title: element.text };
+		});
+		
+
 		this.state = {
-			boxes: {
-				a: { top: 20, left: 80, title: 'Drag me around' },
-				b: { top: 180, left: 20, title: 'Drag me too' },
-			},
+			boxes
 		}
 	}
 
