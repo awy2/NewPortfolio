@@ -13,7 +13,7 @@ export class ApplicationModel {
 
   static nextId = 1;
   static generateId() {
-    return this.nextId++;
+    return this.nextId + 1;
   }
 }
 
