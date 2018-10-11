@@ -3,54 +3,64 @@ import { ApplicationModel } from 'app/models';
 
 export class ApplicationStore {
   constructor(fixtures: ApplicationModel[]) {
-    this.todos = fixtures;
+    this.Applications = fixtures;
   }
 
-  @observable public todos: ApplicationModel[];
+  @observable public Applications: ApplicationModel[];
 
   @computed
-  get activeTodos() {
-    return this.todos.filter(todo => !todo.completed);
+  get minimizeApplications() {
+    return this.Applications.filter(Application => !Application.isOpened);
   }
 
   @computed
-  get completedTodos() {
-    return this.todos.filter(todo => todo.completed);
+  get openApplications() {
+    return this.Applications.filter(Application => Application.isOpened);
   }
 
   @action
-  addTodo = (item: Partial<ApplicationModel>): void => {
-    this.todos.push(new ApplicationModel(item.text, item.completed));
+  addApplication = (item: Partial<ApplicationModel>): void => {
+    this.Applications.push(new ApplicationModel(item.text, item.isOpened, item.top, item.left, item.height, item.width));
   }
 
   @action
-  editTodo = (id: number, data: Partial<ApplicationModel>): void => {
-    this.todos = this.todos.map((todo) => {
-      if (todo.id === id) {
-        if (typeof data.completed === 'boolean') {
-          todo.completed = data.completed;
+  moveApplication = (id: number, data: Partial<ApplicationModel>): void => {
+    this.Applications = this.Applications.map((Application) => {
+      if (Application.id === id) {
+        if (typeof data.left === 'number') {
+          Application.left = data.left;
         }
-        if (typeof data.text === 'string') {
-          todo.text = data.text;
+        if (typeof data.top === 'number') {
+          Application.top = data.top;
         }
       }
-      return todo;
+      return Application;
     });
   }
 
   @action
-  deleteTodo = (id: number): void => {
-    this.todos = this.todos.filter(todo => todo.id !== id);
+  editApplication = (id: number, data: Partial<ApplicationModel>): void => {
+    this.Applications = this.Applications.map((Application) => {
+      if (Application.id === id) {
+        if (typeof data.isOpened === 'boolean') {
+          Application.isOpened = data.isOpened;
+        }
+        if (typeof data.text === 'string') {
+          Application.text = data.text;
+        }
+      }
+      return Application;
+    });
+  }
+
+  @action
+  deleteApplication = (id: number): void => {
+    this.Applications = this.Applications.filter(Application => Application.id !== id);
   }
 
   @action
   completeAll = (): void => {
-    this.todos = this.todos.map(todo => ({ ...todo, completed: true }));
-  }
-
-  @action
-  clearCompleted = (): void => {
-    this.todos = this.todos.filter(todo => !todo.completed);
+    this.Applications = this.Applications.map(Application => ({ ...Application, isOpened: true }));
   }
 }
 

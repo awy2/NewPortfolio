@@ -11,7 +11,7 @@ import { App } from 'app';
 useStrict(true);
 
 const defaultApplication = [
-  new ApplicationModel('Terminal'),
+  new ApplicationModel('Terminal', true, 100, 100, 100, 100),
 ];
 
 // prepare MobX stores

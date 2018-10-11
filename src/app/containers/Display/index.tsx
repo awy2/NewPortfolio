@@ -12,12 +12,13 @@ import reactDndHtml5Backend from 'react-dnd-html5-backend';
 // import ItemTypes from 'types/ItemTypes';
 import ApplicationWindow from 'app/components/ApplicationWindow';
 
+import { observable } from "mobx";
 import { ApplicationStore } from 'app/stores';
 import {
   STORE_APPLICATION,
 } from 'app/constants';
 
-const update = require('immutability-helper');
+// const update = require('immutability-helper');
 
 const styles: React.CSSProperties = {
   width: 300,
@@ -54,7 +55,6 @@ export interface DisplayState {
 }
 
 @inject(STORE_APPLICATION)
-@observer
 @DragDropContext(reactDndHtml5Backend)
 @DropTarget(
   'box', // ItemTypes.BOX,
@@ -63,14 +63,15 @@ export interface DisplayState {
     connectDropTarget: connect.dropTarget(),
   }),
 )
+@observer
 export class Display extends React.Component<
 DisplayProps,
 DisplayState
 > {
+  @observable applications =  this.props[STORE_APPLICATION] as ApplicationStore;
+
   constructor(props: DisplayProps) {
     super(props);
-
-    const applications = this.props[STORE_APPLICATION] as ApplicationStore;
 
     /* tslint:disable-next-line:prefer-const */
     let boxes = {
@@ -78,51 +79,48 @@ DisplayState
       b: { top: 180, left: 20, title: 'Drag me too' },
     };
 
-    applications.todos.forEach((element) => {
-      boxes[element.id] = { top: 40, left: 60, title: element.text };
-    });
 
     this.state = {
       boxes,
     };
   }
 
+  addApplicationTest = () => {
+    const applicationStore = this.applications;   
+    applicationStore.addApplication({text:"test", isOpened:false, top: 100, left: 100, height: 100, width:100});
+  }
+
+  moveBox(id: number, left: number, top: number) {
+    const applicationStore = this.props[STORE_APPLICATION] as ApplicationStore;
+    applicationStore.moveApplication(id, {left: left, top: top});
+  }
+
   public render() {
     const { hideSourceOnDrag, connectDropTarget } = this.props;
-    const { boxes } = this.state;
+    const applications = this.props[STORE_APPLICATION] as ApplicationStore;
+
     return (
       connectDropTarget &&
       connectDropTarget(
         <div style={styles}>
-          {Object.keys(boxes).map((key) => {
-            const { left, top, title } = boxes[key];
+          {applications.Applications.map((applications) => {
+            const { id, left, top, text } = applications;
             return (
-              <ApplicationWindow
-                key={key}
-                id={key}
+                <ApplicationWindow
+                key={id}
+                id={id}
                 left={left}
                 top={top}
                 hideSourceOnDrag={hideSourceOnDrag}
               >
-                {title}
+                {text}
               </ApplicationWindow>
             );
           })}
+          <button onClick={this.addApplicationTest}>test</button>
         </div>,
       )
     );
   }
 
-  public moveBox(id: string, left: number, top: number) {
-
-    this.setState(
-      update(this.state, {
-        boxes: {
-          [id]: {
-            $merge: { left, top },
-          },
-        },
-      }),
-    );
-  }
 }
