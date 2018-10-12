@@ -21,9 +21,8 @@ import {
 // const update = require('immutability-helper');
 
 const styles: React.CSSProperties = {
-  width: 300,
-  height: 300,
-  border: '1px solid black',
+  flex:1,
+  height: '100vh',
   position: 'relative',
 };
 

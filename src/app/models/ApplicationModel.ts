@@ -1,27 +1,22 @@
-import { observable } from 'mobx';
+const uuidv4 = require('uuid/v4');
 
 export class ApplicationModel {
   readonly id: number;
-  @observable public text: string;
-  @observable public isOpened: boolean;
-  @observable public top: number;
-  @observable public left: number;
-  @observable public height: number;
-  @observable public width: number;
+  public text: string;
+  public isOpened: boolean;
+  public top: number;
+  public left: number;
+  public height: number;
+  public width: number;
 
   constructor(text: string, isOpened: boolean = false, top: number, left: number, height: number, width: number) {
-    this.id = ApplicationModel.generateId();
+    this.id = uuidv4();
     this.isOpened = isOpened;
     this.text = text;
     this.top = top;
     this.left = left;
     this.height = height;
     this.width = width;
-  }
-
-  static nextId = 1;
-  static generateId() {
-    return this.nextId + 1;
   }
 }
 

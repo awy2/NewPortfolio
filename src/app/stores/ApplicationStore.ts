@@ -1,5 +1,6 @@
 import { observable, computed, action } from 'mobx';
 import { ApplicationModel } from 'app/models';
+//
 
 export class ApplicationStore {
   constructor(fixtures: ApplicationModel[]) {
@@ -20,7 +21,8 @@ export class ApplicationStore {
 
   @action
   addApplication = (item: Partial<ApplicationModel>): void => {
-    this.Applications.push(new ApplicationModel(item.text, item.isOpened, item.top, item.left, item.height, item.width));
+    const newApp = new ApplicationModel(item.text, item.isOpened, item.top, item.left, item.height, item.width)
+    this.Applications.push(newApp);
   }
 
   @action
