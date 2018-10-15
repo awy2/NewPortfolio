@@ -1,6 +1,5 @@
 import { observable, computed, action } from 'mobx';
 import { ApplicationModel } from 'app/models';
-//
 
 export class ApplicationStore {
   constructor(fixtures: ApplicationModel[]) {
@@ -56,7 +55,7 @@ export class ApplicationStore {
   }
 
   @action
-  deleteApplication = (id: string): void => {
+  closeApplication = (id: string): void => {
     this.Applications = this.Applications.filter(Application => Application.id !== id);
   }
 

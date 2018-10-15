@@ -6,12 +6,16 @@ import { createBrowserHistory } from 'history';
 import { ApplicationModel } from 'app/models';
 import { createStores } from 'app/stores';
 import { App } from 'app';
+import { initializeIcons } from '@uifabric/icons';
+import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
+
+initializeIcons();
 
 // enable MobX strict mode
 useStrict(true);
 
 const defaultApplication = [
-  new ApplicationModel('Terminal', true, 100, 100, 100, 100),
+  new ApplicationModel('Terminal', true, 100, 100, 200, 200),
 ];
 
 // prepare MobX stores
@@ -21,7 +25,9 @@ const rootStore = createStores(history, defaultApplication);
 // render react DOM
 ReactDOM.render(
   <Provider {...rootStore}>
-    <App history={history} />
+    <Fabric>
+      <App history={history} />
+    </Fabric>
   </Provider>,
   document.getElementById('root'),
 );

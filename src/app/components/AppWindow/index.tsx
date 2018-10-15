@@ -1,41 +1,24 @@
 import * as React from 'react';
 import { DragSource, ConnectDragPreview, ConnectDragSource } from 'react-dnd';
 // import ItemTypes from 'types/ItemTypes'
-
 import styled from 'styled-components';
+
+import AppWindowHeader from 'components/AppWindowHeader';
+import { ApplicationModel } from 'app/models';
 
 const windowSource = {
   beginDrag(props: WindowProps) {
-    const { id, left, top } = props;
+    const { id, left, top } = props.application;
     return { id, left, top };
   },
 };
 
-const ApplicationWindow = styled.div`
-  background-Color: black;
-  position: relative;
-  border: 0.05rem solid gray;
-  color: white;
-  cursor: move;
-`;
-
-const AppHeader = styled.div`
-  background-Color: white;
-  position: relative;
-  color: black;
-  padding: 0rem 1rem;
-  height: 1rem;
-  cursor: move;
-`;
-
 export interface WindowProps {
-  connectDragSource?: ConnectDragSource
-  connectDragPreview?: ConnectDragPreview
-  isDragging?: boolean
-  id?: any
-  left?: number
-  top?: number
-  title: string
+  connectDragSource?: ConnectDragSource;
+  connectDragPreview?: ConnectDragPreview;
+  isDragging?: boolean;
+  application: ApplicationModel;
+  closeEvent: (id: string) => void;
 }
 
 @DragSource(
@@ -49,26 +32,40 @@ export interface WindowProps {
 export default class AppWindow extends React.Component<WindowProps> {
   public render() {
     const {
-      left,
-      top,
       connectDragSource,
       connectDragPreview,
       isDragging,
       children,
-      title,
+      application, 
+      closeEvent,
     } = this.props;
-
+    
     if (isDragging) {
       return null;
     }
+
+    const ApplicationWindow = styled.div`
+      background-Color: black;
+      position: relative;
+      border: 0.05rem solid gray;
+      color: white;
+      width: ${application.width}px;
+      height: ${application.height}px;
+    `;
 
     return (
       connectDragPreview &&
       connectDragSource &&
       connectDragPreview(
-        <div style={{ position:"absolute", boxShadow:"0.2rem 0.2rem 0.5rem grey",left, top}}>
+        <div style={{ 
+          position:"absolute", 
+          boxShadow:"0.2rem 0.2rem 0.5rem grey", 
+          left: application.left, 
+          top: application.top}}
+        >
+
           <ApplicationWindow>
-            {connectDragSource(<div><AppHeader>{title}</AppHeader></div>)}
+            {connectDragSource(<div><AppWindowHeader application={application} closeEvent={closeEvent}/></div>)}
             {children}
           </ApplicationWindow>
         </div>)

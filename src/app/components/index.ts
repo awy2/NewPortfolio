@@ -1,1 +1,2 @@
-export * from './ApplicationWindow';
+export * from './AppWindow';
+export * from './AppWindowHeader';
