@@ -26,7 +26,7 @@ export class ApplicationStore {
   }
 
   @action
-  moveApplication = (id: number, data: Partial<ApplicationModel>): void => {
+  moveApplication = (id: string, data: Partial<ApplicationModel>): void => {
     this.Applications = this.Applications.map((Application) => {
       if (Application.id === id) {
         if (typeof data.left === 'number') {
@@ -41,7 +41,7 @@ export class ApplicationStore {
   }
 
   @action
-  editApplication = (id: number, data: Partial<ApplicationModel>): void => {
+  editApplication = (id: string, data: Partial<ApplicationModel>): void => {
     this.Applications = this.Applications.map((Application) => {
       if (Application.id === id) {
         if (typeof data.isOpened === 'boolean') {
@@ -56,7 +56,7 @@ export class ApplicationStore {
   }
 
   @action
-  deleteApplication = (id: number): void => {
+  deleteApplication = (id: string): void => {
     this.Applications = this.Applications.filter(Application => Application.id !== id);
   }
 

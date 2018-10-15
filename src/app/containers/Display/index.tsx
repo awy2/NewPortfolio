@@ -10,7 +10,7 @@ import {
 // import * as style from './style.css';
 import reactDndHtml5Backend from 'react-dnd-html5-backend';
 // import ItemTypes from 'types/ItemTypes';
-import ApplicationWindow from 'app/components/ApplicationWindow';
+import AppWindow from 'app/components/AppWindow';
 
 import { observable } from "mobx";
 import { ApplicationStore } from 'app/stores';
@@ -45,7 +45,6 @@ const boxTarget = {
 };
 
 export interface DisplayProps {
-  hideSourceOnDrag?: boolean
   connectDropTarget?: ConnectDropTarget
 }
 
@@ -56,7 +55,7 @@ export interface DisplayState {
 @inject(STORE_APPLICATION)
 @DragDropContext(reactDndHtml5Backend)
 @DropTarget(
-  'box', // ItemTypes.BOX,
+  'appWindow', // ItemTypes.BOX,
   boxTarget,
   (connect: any) => ({
     connectDropTarget: connect.dropTarget(),
@@ -89,13 +88,13 @@ DisplayState
     applicationStore.addApplication({text:"test", isOpened:false, top: 100, left: 100, height: 100, width:100});
   }
 
-  moveBox(id: number, left: number, top: number) {
+  moveBox(id: string, left: number, top: number) {
     const applicationStore = this.props[STORE_APPLICATION] as ApplicationStore;
     applicationStore.moveApplication(id, {left: left, top: top});
   }
 
   public render() {
-    const { hideSourceOnDrag, connectDropTarget } = this.props;
+    const { connectDropTarget } = this.props;
     const applications = this.props[STORE_APPLICATION] as ApplicationStore;
 
     return (
@@ -105,15 +104,15 @@ DisplayState
           {applications.Applications.map((applications) => {
             const { id, left, top, text } = applications;
             return (
-                <ApplicationWindow
+                <AppWindow
                 key={id}
                 id={id}
                 left={left}
                 top={top}
-                hideSourceOnDrag={hideSourceOnDrag}
+                title={text}
               >
                 {text}
-              </ApplicationWindow>
+              </AppWindow>
             );
           })}
           <button onClick={this.addApplicationTest}>test</button>

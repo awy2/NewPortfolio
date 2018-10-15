@@ -1,7 +1,7 @@
 const uuidv4 = require('uuid/v4');
 
 export class ApplicationModel {
-  readonly id: number;
+  readonly id: string;
   public text: string;
   public isOpened: boolean;
   public top: number;
