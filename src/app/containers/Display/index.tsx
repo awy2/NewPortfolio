@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { inject, observer } from 'mobx-react';
+import { Provider, inject, observer } from 'mobx-react';
 import {
   DropTarget,
   DragDropContext,
@@ -7,7 +7,7 @@ import {
   DropTargetMonitor,
   XYCoord,
 } from 'react-dnd';
-// import * as style from './style.css';
+
 import reactDndHtml5Backend from 'react-dnd-html5-backend';
 // import ItemTypes from 'types/ItemTypes';
 
@@ -81,24 +81,26 @@ export class Display extends React.Component<DisplayProps> {
     const applicationStore = this.props[STORE_APPLICATION] as ApplicationStore;
 
     return (
-      connectDropTarget &&
-      connectDropTarget(
-        <div style={styles}>
-          {applicationStore.Applications.map((applications) => {
-            const { id, text } = applications;
-            return (
-                <AppWindow
-                key={id}
-                application={applications}
-                closeEvent={applicationStore.closeApplication}
-              >
-                {text}
-              </AppWindow>
-            );
-          })}
-          <button onClick={this.addApplicationTest}>test</button>
-        </div>,
-      )
+      <Provider store={applicationStore}>
+        {connectDropTarget &&
+        connectDropTarget(
+          <div style={styles}>
+        
+            {applicationStore.Applications.map((applications) => {
+              const { id, text } = applications;
+              
+              return (
+                <Provider key={id} application={applications}>
+                    <AppWindow key={id}>
+                      {text}
+                    </AppWindow>
+                </Provider>
+              );
+            })}
+            <button onClick={this.addApplicationTest}>test</button>
+          </div>,
+        )}
+      </Provider>
     );
   }
 

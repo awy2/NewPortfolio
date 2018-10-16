@@ -2,6 +2,7 @@ import * as React from 'react';
 import { DragSource, ConnectDragPreview, ConnectDragSource } from 'react-dnd';
 // import ItemTypes from 'types/ItemTypes'
 import styled from 'styled-components';
+import { inject } from 'mobx-react';
 
 import AppWindowHeader from 'components/AppWindowHeader';
 import { ApplicationModel } from 'app/models';
@@ -17,10 +18,10 @@ export interface WindowProps {
   connectDragSource?: ConnectDragSource;
   connectDragPreview?: ConnectDragPreview;
   isDragging?: boolean;
-  application: ApplicationModel;
-  closeEvent: (id: string) => void;
+  application?: ApplicationModel;
 }
 
+@inject('application')
 @DragSource(
   'appWindow', // ItemTypes.BOX,
   windowSource, (connect, monitor) => ({
@@ -37,7 +38,6 @@ export default class AppWindow extends React.Component<WindowProps> {
       isDragging,
       children,
       application, 
-      closeEvent,
     } = this.props;
     
     if (isDragging) {
@@ -65,7 +65,7 @@ export default class AppWindow extends React.Component<WindowProps> {
         >
 
           <ApplicationWindow>
-            {connectDragSource(<div><AppWindowHeader application={application} closeEvent={closeEvent}/></div>)}
+            {connectDragSource(<div><AppWindowHeader /></div>)}
             {children}
           </ApplicationWindow>
         </div>)
