@@ -1,48 +1,59 @@
 import * as React from 'react';
-import { DragSource, ConnectDragPreview, ConnectDragSource } from 'react-dnd';
+
 // import ItemTypes from 'types/ItemTypes'
 import styled from 'styled-components';
+import { Icon } from 'office-ui-fabric-react/lib/Icon';
+
 import { inject } from 'mobx-react';
+import { Rnd } from 'react-rnd';
 
-import AppWindowHeader from 'components/AppWindowHeader';
 import { ApplicationModel } from 'app/models';
-
-const windowSource = {
-  beginDrag(props: WindowProps) {
-    const { id, left, top } = props.application;
-    return { id, left, top };
-  },
-};
+import { ApplicationStore } from 'app/stores';
 
 export interface WindowProps {
-  connectDragSource?: ConnectDragSource;
-  connectDragPreview?: ConnectDragPreview;
-  isDragging?: boolean;
   application?: ApplicationModel;
+  store?: ApplicationStore;
 }
 
-@inject('application')
-@DragSource(
-  'appWindow', // ItemTypes.BOX,
-  windowSource, (connect, monitor) => ({
-    connectDragSource: connect.dragSource(),
-    connectDragPreview: connect.dragPreview(),
-    isDragging: monitor.isDragging(),
-  }),
-)
+@inject('store', 'application')
 export default class AppWindow extends React.Component<WindowProps> {
+  
+  constructor(props: WindowProps) {
+    super(props);
+    
+    this.onMove = this.onMove.bind(this);
+    this.onResize = this.onResize.bind(this);
+  }
+
+  onMove = (left: number, top: number) => {
+    const application = this.props.application;
+    const applicationStore = this.props.store as ApplicationStore;
+
+    applicationStore.moveApplication(application.id, { left, top });
+  }
+  
+  onResize = (width: number, height: number, left: number, top: number) => {
+    const application = this.props.application;
+    const applicationStore = this.props.store as ApplicationStore;
+
+    applicationStore.resizeApplication(application.id, { height, width, left, top });
+  }
+
+  onClose = () => {
+    const application = this.props.application;
+    const applicationStore = this.props.store as ApplicationStore;
+    applicationStore.closeApplication(application.id);
+  }
+  
   public render() {
     const {
-      connectDragSource,
-      connectDragPreview,
-      isDragging,
       children,
       application, 
     } = this.props;
-    
-    if (isDragging) {
-      return null;
-    }
+
+    const headerPadding = 0.2;
+    const headerHeight = 1;
+    const iconSpacing = 0.5;
 
     const ApplicationWindow = styled.div`
       background-Color: black;
@@ -53,22 +64,78 @@ export default class AppWindow extends React.Component<WindowProps> {
       height: ${application.height}px;
     `;
 
-    return (
-      connectDragPreview &&
-      connectDragSource &&
-      connectDragPreview(
-        <div style={{ 
-          position:"absolute", 
-          boxShadow:"0.2rem 0.2rem 0.5rem grey", 
-          left: application.left, 
-          top: application.top}}
-        >
+    const AppHeader = styled.div`
+      background-Color: lightgray;
+      position: relative;
+      color: black;
+      padding: 0rem ${headerPadding}rem;
+      width:${application.width}px;
+      box-sizing: border-box;
+      height: ${headerHeight}rem;
+    `;
 
-          <ApplicationWindow>
-            {connectDragSource(<div><AppWindowHeader /></div>)}
-            {children}
-          </ApplicationWindow>
-        </div>)
+    const AppHeaderText = styled.div`
+      width:auto;
+      overflow: hidden;
+    `;
+
+    const AppHeaderIcons = styled.span`
+      height: 100%;
+      float: right;
+      margin-right: ${-headerPadding}rem;
+      font-size: 0.8rem;
+    `;
+
+    const AppHeaderIcon = styled.span`
+      padding: 0 ${iconSpacing}rem;
+      height: 100%;
+
+      &:hover{
+        background-Color: grey;
+      }
+    `;
+
+    const AppHeaderCloseIcon = styled.span`
+      height: 100%;
+      padding: 0 ${iconSpacing}rem;
+      &:hover{
+        height: ${headerHeight}rem;
+        background-Color: red;
+      }
+    `;
+
+    return (
+        <Rnd
+          size={{
+            width: application.width,
+            height: application.height,
+          }}
+          position={{
+            x: application.left,
+            y: application.top, 
+          }}
+          onDragStop={(e, d) => {
+            this.onMove(d.x, d.y);
+          }}
+
+          onResize={(e, direction, ref, delta, position) => {
+            this.onResize(ref.offsetWidth, ref.offsetHeight, position.x, position.y);
+          }}
+          dragHandleClassName="handle"
+        >
+      <ApplicationWindow>
+        <AppHeader>
+          <AppHeaderIcons>
+            <AppHeaderIcon><Icon iconName="FontColorSwatch" className="ms-IconExample" /></AppHeaderIcon>
+            <AppHeaderIcon><Icon iconName="GridViewLarge" className="ms-IconExample" /></AppHeaderIcon>
+            <AppHeaderCloseIcon onClick={this.onClose}><Icon iconName="Clear" className="ms-IconExample" /></AppHeaderCloseIcon>
+          </AppHeaderIcons>
+          <AppHeaderText className="handle">{application.text}</AppHeaderText>
+        </AppHeader>
+        
+        {children}
+      </ApplicationWindow>
+        </Rnd>
     );
   }
 }

@@ -40,6 +40,27 @@ export class ApplicationStore {
   }
 
   @action
+  resizeApplication = (id: string, data: Partial<ApplicationModel>): void => {
+    this.Applications = this.Applications.map((Application) => {
+      if (Application.id === id) {
+        if (typeof data.height === 'number') {
+          Application.height = data.height;
+        }
+        if (typeof data.width === 'number') {
+          Application.width = data.width;
+        }
+        if (typeof data.left === 'number') {
+          Application.left = data.left;
+        }
+        if (typeof data.top === 'number') {
+          Application.top = data.top;
+        }
+      }
+      return Application;
+    });
+  }
+
+  @action
   editApplication = (id: string, data: Partial<ApplicationModel>): void => {
     this.Applications = this.Applications.map((Application) => {
       if (Application.id === id) {

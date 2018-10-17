@@ -1,23 +1,14 @@
 import * as React from 'react';
-import { Provider, inject, observer } from 'mobx-react';
-import {
-  DropTarget,
-  DragDropContext,
-  ConnectDropTarget,
-  DropTargetMonitor,
-  XYCoord,
-} from 'react-dnd';
 
-import reactDndHtml5Backend from 'react-dnd-html5-backend';
+import { Provider, inject, observer } from 'mobx-react';
+
 // import ItemTypes from 'types/ItemTypes';
 
 import { observable } from "mobx";
 
 import AppWindow from 'components/AppWindow';
 import { ApplicationStore } from 'app/stores';
-import {
-  STORE_APPLICATION,
-} from 'app/constants';
+import { STORE_APPLICATION } from 'app/constants';
 
 // const update = require('immutability-helper');
 
@@ -27,37 +18,13 @@ const styles: React.CSSProperties = {
   position: 'relative',
 };
 
-const boxTarget = {
-  drop(
-    props: DisplayProps,
-    monitor: DropTargetMonitor,
-    component: Display | null,
-  ) {
-    if (!component) {
-      return;
-    }
-    const item = monitor.getItem();
-    const delta = monitor.getDifferenceFromInitialOffset() as XYCoord;
-    const left = Math.round(item.left + delta.x);
-    const top = Math.round(item.top + delta.y);
 
-    component.moveBox(item.id, left, top);
-  },
-};
 
 export interface DisplayProps {
-  connectDropTarget?: ConnectDropTarget
+
 }
 
 @inject(STORE_APPLICATION)
-@DragDropContext(reactDndHtml5Backend)
-@DropTarget(
-  'appWindow', // ItemTypes.BOX,
-  boxTarget,
-  (connect: any) => ({
-    connectDropTarget: connect.dropTarget(),
-  }),
-)
 @observer
 export class Display extends React.Component<DisplayProps> {
   @observable applications =  this.props[STORE_APPLICATION] as ApplicationStore;
@@ -77,13 +44,11 @@ export class Display extends React.Component<DisplayProps> {
   }
 
   public render() {
-    const { connectDropTarget } = this.props;
+
     const applicationStore = this.props[STORE_APPLICATION] as ApplicationStore;
 
     return (
       <Provider store={applicationStore}>
-        {connectDropTarget &&
-        connectDropTarget(
           <div style={styles}>
         
             {applicationStore.Applications.map((applications) => {
@@ -98,8 +63,7 @@ export class Display extends React.Component<DisplayProps> {
               );
             })}
             <button onClick={this.addApplicationTest}>test</button>
-          </div>,
-        )}
+          </div>
       </Provider>
     );
   }
