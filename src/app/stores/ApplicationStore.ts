@@ -2,15 +2,14 @@ import { observable, computed, action } from 'mobx';
 import { ApplicationModel } from 'app/models';
 
 export class ApplicationStore {
+  @observable public Applications: ApplicationModel[];
+  lastTop: number;
+  lastLeft: number;
+
   constructor(fixtures: ApplicationModel[]) {
     this.Applications = fixtures;
-  }
-
-  @observable public Applications: ApplicationModel[];
-
-  @computed
-  get minimizeApplications() {
-    return this.Applications.filter(Application => !Application.isOpened);
+    this.lastTop = 100;
+    this.lastLeft = 100;
   }
 
   @computed
@@ -20,7 +19,24 @@ export class ApplicationStore {
 
   @action
   addApplication = (item: Partial<ApplicationModel>): void => {
-    const newApp = new ApplicationModel(item.text, item.isOpened, item.top, item.left, item.height, item.width)
+    
+    this.lastTop = this.lastTop + 50;
+    this.lastLeft = this.lastTop + 50;
+
+    if( window.innerHeight < (this.lastTop + item.height) 
+      || window.innerWidth < (this.lastLeft + item.width)) {
+      this.lastTop = 100;
+      this.lastLeft = 100;
+    }
+
+    const newApp = new ApplicationModel({
+      text: item.text, 
+      title: item.text,
+      top: this.lastTop, 
+      left: this.lastLeft, 
+      height: item.height,
+      width: item.width
+      })
     this.Applications.push(newApp);
   }
 
@@ -61,15 +77,20 @@ export class ApplicationStore {
   }
 
   @action
-  editApplication = (id: string, data: Partial<ApplicationModel>): void => {
+  toggleApplicationMaximize = (id: string): void => {
     this.Applications = this.Applications.map((Application) => {
       if (Application.id === id) {
-        if (typeof data.isOpened === 'boolean') {
-          Application.isOpened = data.isOpened;
-        }
-        if (typeof data.text === 'string') {
-          Application.text = data.text;
-        }
+        Application.isMaximize = !Application.isMaximize;
+      }
+      return Application;
+    });
+  }
+
+  @action
+  toggleApplicationMinimize = (id: string): void => {
+    this.Applications = this.Applications.map((Application) => {
+      if (Application.id === id) {
+        Application.isOpened = !Application.isOpened;
       }
       return Application;
     });
@@ -81,8 +102,8 @@ export class ApplicationStore {
   }
 
   @action
-  completeAll = (): void => {
-    this.Applications = this.Applications.map(Application => ({ ...Application, isOpened: true }));
+  minimizeAll = (): void => {
+    this.Applications = this.Applications.map(Application => ({ ...Application, isOpened: false }));
   }
 }
 

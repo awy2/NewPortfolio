@@ -15,7 +15,15 @@ initializeIcons();
 useStrict(true);
 
 const defaultApplication = [
-  new ApplicationModel('Terminal', true, 100, 100, 200, 200),
+  new ApplicationModel({
+    text: "TERMINAL",
+    title: "terminal",
+
+    top: 100, 
+    left: 100, 
+    height: 100,
+    width: 200
+    }),
 ];
 
 // prepare MobX stores

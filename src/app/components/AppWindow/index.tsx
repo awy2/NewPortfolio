@@ -23,26 +23,49 @@ export default class AppWindow extends React.Component<WindowProps> {
     
     this.onMove = this.onMove.bind(this);
     this.onResize = this.onResize.bind(this);
+    this.onMaximizeToggle = this.onMaximizeToggle.bind(this);
+    this.onMinimizeToggle = this.onMinimizeToggle.bind(this);
   }
 
   onMove = (left: number, top: number) => {
-    const application = this.props.application;
-    const applicationStore = this.props.store as ApplicationStore;
-
-    applicationStore.moveApplication(application.id, { left, top });
+    const { application, store } = this.props;
+    store.moveApplication(application.id, { left, top });
   }
   
   onResize = (width: number, height: number, left: number, top: number) => {
-    const application = this.props.application;
-    const applicationStore = this.props.store as ApplicationStore;
-
-    applicationStore.resizeApplication(application.id, { height, width, left, top });
+    const { application, store } = this.props;
+    store.resizeApplication(application.id, { height, width, left, top });
   }
 
   onClose = () => {
-    const application = this.props.application;
-    const applicationStore = this.props.store as ApplicationStore;
-    applicationStore.closeApplication(application.id);
+    const { application, store } = this.props;
+    store.closeApplication(application.id);
+  }
+
+  onMaximizeToggle = () => {
+    const { application, store } = this.props;
+    store.toggleApplicationMaximize(application.id);
+  }
+  
+  onMinimizeToggle = () => {
+    const { application, store } = this.props;
+    store.toggleApplicationMinimize(application.id);
+  }
+
+  getApplicationPosition = () => {
+    const { application } = this.props;
+    return {
+      x: application.left,
+      y: application.top, 
+    };
+  }
+
+  getApplicationSize = () => {
+    const { application } = this.props;
+    return {
+      width: application.width,
+      height: application.height,
+    };
   }
   
   public render() {
@@ -103,39 +126,32 @@ export default class AppWindow extends React.Component<WindowProps> {
         background-Color: red;
       }
     `;
-
+     
     return (
-        <Rnd
-          size={{
-            width: application.width,
-            height: application.height,
-          }}
-          position={{
-            x: application.left,
-            y: application.top, 
-          }}
-          onDragStop={(e, d) => {
-            this.onMove(d.x, d.y);
-          }}
+      <Rnd
+        size={this.getApplicationSize()}
+        position={this.getApplicationPosition()}
+        onDragStop={(e, d) => {
+          this.onMove(d.x, d.y);
+        }}
 
-          onResize={(e, direction, ref, delta, position) => {
-            this.onResize(ref.offsetWidth, ref.offsetHeight, position.x, position.y);
-          }}
-          dragHandleClassName="handle"
-        >
-      <ApplicationWindow>
-        <AppHeader>
-          <AppHeaderIcons>
-            <AppHeaderIcon><Icon iconName="FontColorSwatch" className="ms-IconExample" /></AppHeaderIcon>
-            <AppHeaderIcon><Icon iconName="GridViewLarge" className="ms-IconExample" /></AppHeaderIcon>
-            <AppHeaderCloseIcon onClick={this.onClose}><Icon iconName="Clear" className="ms-IconExample" /></AppHeaderCloseIcon>
-          </AppHeaderIcons>
-          <AppHeaderText className="handle">{application.text}</AppHeaderText>
-        </AppHeader>
-        
-        {children}
-      </ApplicationWindow>
-        </Rnd>
+        onResize={(e, direction, ref, delta, position) => {
+          this.onResize(ref.offsetWidth, ref.offsetHeight, position.x, position.y);
+        }}
+        dragHandleClassName="handle"
+      >
+        <ApplicationWindow>
+          <AppHeader>
+            <AppHeaderIcons>
+              <AppHeaderIcon><Icon onClick={this.onMinimizeToggle} iconName="FontColorSwatch" className="ms-IconExample" /></AppHeaderIcon>
+              <AppHeaderIcon><Icon onClick={this.onMaximizeToggle} iconName="GridViewLarge" className="ms-IconExample" /></AppHeaderIcon>
+              <AppHeaderCloseIcon onClick={this.onClose}><Icon iconName="Clear" className="ms-IconExample" /></AppHeaderCloseIcon>
+            </AppHeaderIcons>
+            <AppHeaderText className="handle">{application.text}</AppHeaderText>
+          </AppHeader>
+          {children}
+        </ApplicationWindow>
+      </Rnd>
     );
   }
 }

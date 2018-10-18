@@ -1,12 +1,11 @@
 import * as React from 'react';
 
 import { Provider, inject, observer } from 'mobx-react';
-
-// import ItemTypes from 'types/ItemTypes';
-
 import { observable } from "mobx";
 
 import AppWindow from 'components/AppWindow';
+import AppBar from 'components/AppBar';
+
 import { ApplicationStore } from 'app/stores';
 import { STORE_APPLICATION } from 'app/constants';
 
@@ -16,12 +15,10 @@ const styles: React.CSSProperties = {
   flex:1,
   height: '100vh',
   position: 'relative',
+  overflowY: 'hidden',
 };
 
-
-
 export interface DisplayProps {
-
 }
 
 @inject(STORE_APPLICATION)
@@ -35,7 +32,7 @@ export class Display extends React.Component<DisplayProps> {
 
   addApplicationTest = () => {
     const applicationStore = this.applications;   
-    applicationStore.addApplication({text:"test", isOpened:false, top: 100, left: 100, height: 100, width:200});
+    applicationStore.addApplication({text:"test", isOpened:false, height: 200, width:200});
   }
 
   moveBox(id: string, left: number, top: number) {
@@ -46,12 +43,11 @@ export class Display extends React.Component<DisplayProps> {
   public render() {
 
     const applicationStore = this.props[STORE_APPLICATION] as ApplicationStore;
-
     return (
       <Provider store={applicationStore}>
           <div style={styles}>
         
-            {applicationStore.Applications.map((applications) => {
+            {applicationStore.openApplications.map((applications) => {
               const { id, text } = applications;
               
               return (
@@ -63,6 +59,7 @@ export class Display extends React.Component<DisplayProps> {
               );
             })}
             <button onClick={this.addApplicationTest}>test</button>
+            <AppBar/>
           </div>
       </Provider>
     );
