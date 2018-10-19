@@ -15,7 +15,7 @@ const styles: React.CSSProperties = {
   flex:1,
   height: '100vh',
   position: 'relative',
-  overflowY: 'hidden',
+  overflow: 'hidden',
 };
 
 export interface DisplayProps {
@@ -47,7 +47,7 @@ export class Display extends React.Component<DisplayProps> {
       <Provider store={applicationStore}>
           <div style={styles}>
         
-            {applicationStore.openApplications.map((applications) => {
+            {applicationStore.Applications.map((applications) => {
               const { id, text } = applications;
               
               return (

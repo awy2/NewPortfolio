@@ -36,6 +36,10 @@ export class ApplicationModel {
     this.height = obj.height;
     this.width = obj.width;
   }
+
+  getTaskbarID = (): string => {
+    return `taskbar_${this.id}`
+  }
 }
 
 export default ApplicationModel;

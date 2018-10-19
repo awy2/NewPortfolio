@@ -3,7 +3,7 @@ import * as React from 'react';
 // import ItemTypes from 'types/ItemTypes'
 import styled from 'styled-components';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
-
+import {Motion, spring} from 'react-motion';
 import { inject } from 'mobx-react';
 import { Rnd } from 'react-rnd';
 
@@ -52,19 +52,69 @@ export default class AppWindow extends React.Component<WindowProps> {
     store.toggleApplicationMinimize(application.id);
   }
 
-  getApplicationPosition = () => {
+  getCurrentStyle = () => {
+    const { application } = this.props;
+
+    let { 
+      x: newLeft,
+      y: newTop,
+      width: newWidth,
+      height: newHeight,
+    } = this.getApplicationSize();
+
+    return {
+      x: newLeft,// spring(newLeft),
+      y: newTop, //spring(newTop),
+      width: spring(newWidth),
+      height: spring(newHeight),
+      opacity: spring(application.isOpened ? 1 : 0),
+    };
+  }
+
+  getApplicationSize = (): { x: number, y:number, width: number, height: number } => {
+    const { application } = this.props;
+
+    const applicationBar = document.getElementById(application.getTaskbarID());
+    
+    let bounding;
+    let { 
+      left: newLeft = 0, 
+      top: newTop = 0,
+      width: newWidth = 0,
+      height: newHeight = 0 
+    } = application;
+
+    if(application.isOpened === false 
+      && applicationBar){
+      bounding = applicationBar.getBoundingClientRect();
+      newTop = bounding.y;
+      newLeft = bounding.x;
+    }
+
+    if(application.isMaximize
+      && application.isOpened){
+      newWidth = window.innerWidth;
+      newHeight = window.innerHeight - 32;//32 for taskbar, need to find a better solution
+      newTop = 0;
+      newLeft = 0;
+    }
+
+    return {
+      x: newLeft,
+      y: newTop,
+      width: newWidth,
+      height: newHeight,
+    };
+  }
+
+  getDefaultStyle = () => {
     const { application } = this.props;
     return {
       x: application.left,
       y: application.top, 
-    };
-  }
-
-  getApplicationSize = () => {
-    const { application } = this.props;
-    return {
       width: application.width,
       height: application.height,
+      opacity: 1,
     };
   }
   
@@ -77,14 +127,15 @@ export default class AppWindow extends React.Component<WindowProps> {
     const headerPadding = 0.2;
     const headerHeight = 1;
     const iconSpacing = 0.5;
+    const { height: appHeight, width: appWidth } = this.getApplicationSize();
 
     const ApplicationWindow = styled.div`
       background-Color: black;
       position: relative;
-      border: 0.05rem solid gray;
+      border: 0.08rem solid gray;
       color: white;
-      width: ${application.width}px;
-      height: ${application.height}px;
+      width: ${ appWidth }px;
+      height: ${ appHeight }px;
     `;
 
     const AppHeader = styled.div`
@@ -92,7 +143,7 @@ export default class AppWindow extends React.Component<WindowProps> {
       position: relative;
       color: black;
       padding: 0rem ${headerPadding}rem;
-      width:${application.width}px;
+      width:${appWidth}px;
       box-sizing: border-box;
       height: ${headerHeight}rem;
     `;
@@ -126,32 +177,37 @@ export default class AppWindow extends React.Component<WindowProps> {
         background-Color: red;
       }
     `;
-     
+    
     return (
-      <Rnd
-        size={this.getApplicationSize()}
-        position={this.getApplicationPosition()}
-        onDragStop={(e, d) => {
-          this.onMove(d.x, d.y);
-        }}
-
-        onResize={(e, direction, ref, delta, position) => {
-          this.onResize(ref.offsetWidth, ref.offsetHeight, position.x, position.y);
-        }}
-        dragHandleClassName="handle"
-      >
-        <ApplicationWindow>
-          <AppHeader>
-            <AppHeaderIcons>
-              <AppHeaderIcon><Icon onClick={this.onMinimizeToggle} iconName="FontColorSwatch" className="ms-IconExample" /></AppHeaderIcon>
-              <AppHeaderIcon><Icon onClick={this.onMaximizeToggle} iconName="GridViewLarge" className="ms-IconExample" /></AppHeaderIcon>
-              <AppHeaderCloseIcon onClick={this.onClose}><Icon iconName="Clear" className="ms-IconExample" /></AppHeaderCloseIcon>
-            </AppHeaderIcons>
-            <AppHeaderText className="handle">{application.text}</AppHeaderText>
-          </AppHeader>
-          {children}
-        </ApplicationWindow>
-      </Rnd>
+      <Motion defaultStyle={this.getDefaultStyle()} style={ this.getCurrentStyle() }>
+       { ({x, y, height, width, opacity}) =>
+        
+        <Rnd
+          size={{height, width}}
+          position={{x, y}}
+          onDragStop={(e, d) => {
+            this.onMove(d.x, d.y);
+          }}
+          style={{opacity}}
+          onResize={(e, direction, ref, delta, position) => {
+            this.onResize(ref.offsetWidth, ref.offsetHeight, position.x, position.y);
+          }}
+          dragHandleClassName="handle"
+        >
+          <ApplicationWindow>
+            <AppHeader>
+              <AppHeaderIcons>
+                <AppHeaderIcon><Icon onClick={this.onMinimizeToggle} iconName="FontColorSwatch" className="ms-IconExample" /></AppHeaderIcon>
+                <AppHeaderIcon><Icon onClick={this.onMaximizeToggle} iconName="GridViewLarge" className="ms-IconExample" /></AppHeaderIcon>
+                <AppHeaderCloseIcon onClick={this.onClose}><Icon iconName="Clear" className="ms-IconExample" /></AppHeaderCloseIcon>
+              </AppHeaderIcons>
+              <AppHeaderText className="handle">{application.text}</AppHeaderText>
+            </AppHeader>
+            {children}
+          </ApplicationWindow>
+        </Rnd>
+       }
+      </Motion>
     );
   }
 }

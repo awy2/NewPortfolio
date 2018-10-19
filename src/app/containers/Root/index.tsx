@@ -13,7 +13,7 @@ export class Root extends React.Component<any, any> {
     return (
       <div className="container">
         {this.props.children}
-        {this.renderDevTool()}
+        {/*this.renderDevTool()*/}
       </div>
     );
   }

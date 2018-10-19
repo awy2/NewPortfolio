@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import { inject, observer } from 'mobx-react';
 import {  observable } from 'mobx';
 import { CommandBar } from 'office-ui-fabric-react/lib/CommandBar';
-//import { CommandBarButton } from 'office-ui-fabric-react/lib/Button';
 
 import { STORE_APPLICATION } from 'app/constants';
 import { ApplicationStore } from 'app/stores';
@@ -42,6 +41,7 @@ export default class AppBar extends React.Component<AppBarProps> {
         return  {
           key: application.id,
           name: application.text,
+          id: application.getTaskbarID(),
           iconProps: {
             iconName: 'Share'
           },
@@ -63,7 +63,7 @@ export default class AppBar extends React.Component<AppBarProps> {
   `;
 
     return (
-      <AppBar className="asdf">
+      <AppBar>
         <CommandBar
             items={this.onGetButtons()}
             styles={{
