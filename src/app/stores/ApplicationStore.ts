@@ -5,16 +5,34 @@ export class ApplicationStore {
   @observable public Applications: ApplicationModel[];
   lastTop: number;
   lastLeft: number;
+  lastSequence: number;
+  lastSelectedApplicationID: string;
 
   constructor(fixtures: ApplicationModel[]) {
     this.Applications = fixtures;
     this.lastTop = 100;
     this.lastLeft = 100;
+    this.lastSequence = 1;
+    this.lastSelectedApplicationID = null;
   }
 
   @computed
   get openApplications() {
     return this.Applications.filter(Application => Application.isOpened);
+  }
+
+  @action
+  onSelectApplication = (id: string) => {
+
+    this.lastSequence += 1;
+    this.lastSelectedApplicationID = id;
+
+    this.Applications = this.Applications.map((Application) => {
+      if (Application.id === id) {
+        Application.sequence = this.lastSequence;
+      }
+      return Application;
+    });  
   }
 
   @action
@@ -29,14 +47,19 @@ export class ApplicationStore {
       this.lastLeft = 100;
     }
 
+    this.lastSequence =+ 1;
+
     const newApp = new ApplicationModel({
       text: item.text, 
       title: item.text,
       top: this.lastTop, 
       left: this.lastLeft, 
       height: item.height,
-      width: item.width
-      })
+      width: item.width,
+      sequence: this.lastSequence
+    });
+
+    this.lastSelectedApplicationID = newApp.id;
     this.Applications.push(newApp);
   }
 

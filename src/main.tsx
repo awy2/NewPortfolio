@@ -18,7 +18,7 @@ const defaultApplication = [
   new ApplicationModel({
     text: "TERMINAL",
     title: "terminal",
-
+    sequence: 1,
     top: 100, 
     left: 100, 
     height: 100,

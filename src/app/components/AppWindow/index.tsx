@@ -28,6 +28,7 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
 
     this.state = { showMovement: true, isOpened: props.application.isOpened };
 
+    this.onSelect = this.onSelect.bind(this);
     this.onMove = this.onMove.bind(this);
     this.onResize = this.onResize.bind(this);
     this.onMaximizeToggle = this.onMaximizeToggle.bind(this);
@@ -45,6 +46,13 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
       if(this.state.showMovement !== showMovement ){
         this.setState({showMovement, isOpened: preApp.isOpened});
       }
+  }
+
+  onSelect = () => {
+    const { application, store } = this.props;
+    if(store.lastSelectedApplicationID !== application.id){
+      store.onSelectApplication(application.id); 
+    }
   }
 
   onMove = (left: number, top: number) => {
@@ -204,20 +212,21 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
     return (
       <Motion defaultStyle={this.getDefaultStyle()} style={ this.getCurrentStyle() }>
        { ({x, y, height, width, opacity}) =>
-        
         <Rnd
           size={{height, width}}
           position={{x, y}}
+          onDragStart={this.onSelect}
           onDragStop={(e, d) => {
             this.onMove(d.x, d.y);
           }}
-          style={{opacity}}
+          style={{opacity, zIndex: application.sequence}}
+          onResizeStart={this.onSelect}
           onResize={(e, direction, ref, delta, position) => {
             this.onResize(ref.offsetWidth, ref.offsetHeight, position.x, position.y);
           }}
           dragHandleClassName="handle"
         >
-          <ApplicationWindow>
+          <ApplicationWindow onClick={this.onSelect} >
             <AppHeader>
               <AppHeaderIcons>
                 <AppHeaderIcon><Icon onClick={this.onMinimizeToggle} iconName="FontColorSwatch" className="ms-IconExample" /></AppHeaderIcon>
