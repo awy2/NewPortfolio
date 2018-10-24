@@ -16,14 +16,14 @@ useStrict(true);
 
 const defaultApplication = [
   new ApplicationModel({
-    text: "TERMINAL",
-    title: "terminal",
+    text: 'TERMINAL',
+    title: 'terminal',
     sequence: 1,
-    top: 100, 
-    left: 100, 
+    top: 100,
+    left: 100,
     height: 100,
-    width: 200
-    }),
+    width: 200,
+  }),
 ];
 
 // prepare MobX stores

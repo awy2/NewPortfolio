@@ -33,7 +33,7 @@ export class ApplicationModel {
     this.isMaximize = obj.isMaximize;
     this.text = obj.text;
     this.title = obj.title;
-    
+
     this.top = obj.top;
     this.left = obj.left;
     this.height = obj.height;
@@ -41,7 +41,7 @@ export class ApplicationModel {
   }
 
   getTaskbarID = (): string => {
-    return `taskbar_${this.id}`
+    return `taskbar_${this.id}`;
   }
 }
 

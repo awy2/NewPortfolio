@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Provider, inject, observer } from 'mobx-react';
-import { observable } from "mobx";
+import { observable } from 'mobx';
 
 import AppWindow from 'components/AppWindow';
 import AppBar from 'components/AppBar';
@@ -31,13 +31,13 @@ export class Display extends React.Component<DisplayProps> {
   }
 
   addApplicationTest = () => {
-    const applicationStore = this.applications;   
-    applicationStore.addApplication({text:"test", isOpened:false, height: 200, width:200});
+    const applicationStore = this.applications;
+    applicationStore.addApplication({ text: 'test', isOpened: false, height: 200, width:200 });
   }
 
   moveBox(id: string, left: number, top: number) {
     const applicationStore = this.props[STORE_APPLICATION] as ApplicationStore;
-    applicationStore.moveApplication(id, {left: left, top: top});
+    applicationStore.moveApplication(id, { left, top });
   }
 
   public render() {
@@ -46,12 +46,12 @@ export class Display extends React.Component<DisplayProps> {
     return (
       <Provider store={applicationStore}>
           <div style={styles}>
-        
-            {applicationStore.Applications.map((applications) => {
-              const { id, text } = applications;
-              
+
+            {applicationStore.applications.map((apps) => {
+              const { id, text } = apps;
+
               return (
-                <Provider key={id} application={applications}>
+                <Provider key={id} application={apps}>
                     <AppWindow key={id}>
                       {text}
                     </AppWindow>

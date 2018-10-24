@@ -3,7 +3,7 @@ import * as React from 'react';
 // import ItemTypes from 'types/ItemTypes'
 import styled from 'styled-components';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
-import {Motion, spring} from 'react-motion';
+import { Motion, spring } from 'react-motion';
 import { inject } from 'mobx-react';
 import { Rnd } from 'react-rnd';
 
@@ -36,22 +36,22 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
   }
 
   componentWillReceiveProps(nextProps) {
-      let showMovement = false;
-      const { application : preApp = { isOpened : false } } = nextProps;
+    let showMovement = false;
+    const { application : preApp = { isOpened : false } } = nextProps;
 
-      if(preApp.isOpened !== this.state.isOpened ){
-        showMovement = true;
-      }
+    if (preApp.isOpened !== this.state.isOpened) {
+      showMovement = true;
+    }
 
-      if(this.state.showMovement !== showMovement ){
-        this.setState({showMovement, isOpened: preApp.isOpened});
-      }
+    if (this.state.showMovement !== showMovement) {
+      this.setState({ showMovement, isOpened: preApp.isOpened });
+    }
   }
 
   onSelect = () => {
     const { application, store } = this.props;
-    if(store.lastSelectedApplicationID !== application.id){
-      store.onSelectApplication(application.id); 
+    if (store.lastSelectedApplicationID !== application.id) {
+      store.onSelectApplication(application.id);
     }
   }
 
@@ -59,7 +59,7 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
     const { application, store } = this.props;
     store.moveApplication(application.id, { left, top });
   }
-  
+
   onResize = (width: number, height: number, left: number, top: number) => {
     const { application, store } = this.props;
     store.resizeApplication(application.id, { height, width, left, top });
@@ -74,7 +74,7 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
     const { application, store } = this.props;
     store.toggleApplicationMaximize(application.id);
   }
-  
+
   onMinimizeToggle = () => {
     const { application, store } = this.props;
     store.toggleApplicationMinimize(application.id);
@@ -84,14 +84,14 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
     const { application } = this.props;
     const { showMovement } = this.state;
 
-    let { 
+    const {
       x: newLeft,
       y: newTop,
       width: newWidth,
       height: newHeight,
     } = this.getApplicationSize();
 
-    //let config = {stiffness: 20, damping: 40};
+    // let config = {stiffness: 20, damping: 40};
 
     return {
       x: showMovement ?  spring(newLeft) : newLeft,
@@ -106,26 +106,26 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
     const { application } = this.props;
 
     const applicationBar = document.getElementById(application.getTaskbarID());
-    
+
     let bounding;
-    let { 
-      left: newLeft = 0, 
+    let {
+      left: newLeft = 0,
       top: newTop = 0,
       width: newWidth = 0,
-      height: newHeight = 0 
+      height: newHeight = 0,
     } = application;
 
-    if(application.isOpened === false 
-      && applicationBar){
+    if (application.isOpened === false
+      && applicationBar) {
       bounding = applicationBar.getBoundingClientRect();
       newTop = bounding.y;
       newLeft = bounding.x;
     }
 
-    if(application.isMaximize
-      && application.isOpened){
+    if (application.isMaximize
+      && application.isOpened) {
       newWidth = window.innerWidth;
-      newHeight = window.innerHeight - 32;//32 for taskbar, need to find a better solution
+      newHeight = window.innerHeight - 32; // TODO: 32 for taskbar, need to find a better solution
       newTop = 0;
       newLeft = 0;
     }
@@ -142,7 +142,7 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
     const { application } = this.props;
     return {
       x: application.left,
-      y: application.top, 
+      y: application.top,
       width: application.width,
       height: application.height,
       opacity: 1,
@@ -152,7 +152,7 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
   public render() {
     const {
       children,
-      application, 
+      application,
     } = this.props;
 
     const headerPadding = 0.2;
@@ -208,30 +208,38 @@ export default class AppWindow extends React.Component<WindowProps, WindowState>
         background-Color: red;
       }
     `;
-    
+
     return (
       <Motion defaultStyle={this.getDefaultStyle()} style={ this.getCurrentStyle() }>
-       { ({x, y, height, width, opacity}) =>
+       { ({ x, y, height, width, opacity }) =>
         <Rnd
-          size={{height, width}}
-          position={{x, y}}
+          size={{ height, width }}
+          position={{ x, y }}
           onDragStart={this.onSelect}
           onDragStop={(e, d) => {
             this.onMove(d.x, d.y);
           }}
-          style={{opacity, zIndex: application.sequence}}
+          style={{ opacity, zIndex: application.sequence }}
           onResizeStart={this.onSelect}
           onResize={(e, direction, ref, delta, position) => {
             this.onResize(ref.offsetWidth, ref.offsetHeight, position.x, position.y);
           }}
           dragHandleClassName="handle"
         >
-          <ApplicationWindow onClick={this.onSelect} >
+          <ApplicationWindow 
+          onClick={this.onSelect} 
+          >
             <AppHeader>
               <AppHeaderIcons>
-                <AppHeaderIcon><Icon onClick={this.onMinimizeToggle} iconName="FontColorSwatch" className="ms-IconExample" /></AppHeaderIcon>
-                <AppHeaderIcon><Icon onClick={this.onMaximizeToggle} iconName="GridViewLarge" className="ms-IconExample" /></AppHeaderIcon>
-                <AppHeaderCloseIcon onClick={this.onClose}><Icon iconName="Clear" className="ms-IconExample" /></AppHeaderCloseIcon>
+                <AppHeaderIcon>
+                  <Icon onClick={this.onMinimizeToggle} iconName="FontColorSwatch" className="ms-IconExample" />
+                </AppHeaderIcon>
+                <AppHeaderIcon>
+                  <Icon onClick={this.onMaximizeToggle} iconName="GridViewLarge" className="ms-IconExample" />
+                </AppHeaderIcon>
+                <AppHeaderCloseIcon onClick={this.onClose}>
+                  <Icon iconName="Clear" className="ms-IconExample" />
+                </AppHeaderCloseIcon>
               </AppHeaderIcons>
               <AppHeaderText className="handle">{application.text}</AppHeaderText>
             </AppHeader>

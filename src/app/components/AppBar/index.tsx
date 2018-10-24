@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-//import { Icon } from 'office-ui-fabric-react/lib/Icon';
+// import { Icon } from 'office-ui-fabric-react/lib/Icon';
 import { inject, observer } from 'mobx-react';
 import {  observable } from 'mobx';
 import { CommandBar } from 'office-ui-fabric-react/lib/CommandBar';
@@ -26,41 +26,43 @@ export default class AppBar extends React.Component<AppBarProps> {
     const { store } = this.props;
     store.closeApplication(id);
   }
-  
+
   onMinimizeToggle = (application) => {
     const { store } = this.props;
+    if(!application.isOpened){
+      store.onSelectApplication(application.id);
+    }
     store.toggleApplicationMinimize(application.id);
   }
 
   onGetButtons = () => {
     const { store } = this.props;
     const onClickEvent = this.onMinimizeToggle;
-    
-    return store.Applications.map( application => 
-      {
-        return  {
-          key: application.id,
-          name: application.text,
-          id: application.getTaskbarID(),
-          iconProps: {
-            iconName: 'Share'
-          },
-          onClick: () => { onClickEvent(application) }
-        }
-      }
-    );
+
+    return store.applications.map((application) => {
+      return  {
+        key: application.id,
+        name: application.text,
+        id: application.getTaskbarID(),
+        iconProps: {
+          iconName: 'Share',
+        },
+        onClick: () => { onClickEvent(application) },
+      };
+    });
   }
 
   render() {
 
-  const AppBar = styled.div`
-    height: 2rem;
-    background-color: darkgrey;
-    width: 100%;
-    bottom: 0px;
-    position: absolute;
-    opacity: 0.9;
-  `;
+    const AppBar = styled.div`
+      height: 2rem;
+      background-color: darkgrey;
+      width: 100%;
+      bottom: 0px;
+      position: absolute;
+      opacity: 0.9;
+      z-index: 999999999999;
+    `;
 
     return (
       <AppBar>
@@ -68,9 +70,9 @@ export default class AppBar extends React.Component<AppBarProps> {
             items={this.onGetButtons()}
             styles={{
               root: {
-                height: "2rem",
-                backgroundColor: "black",
-              }
+                height: '2rem',
+                backgroundColor: 'black',
+              },
             }}
             ariaLabel={'Use left and right arrow keys to navigate between commands'}
           />
