@@ -15,16 +15,36 @@ export interface WindowProps {
   store?: ApplicationStore;
 }
 
+export interface WindowState {
+  showMovement: boolean;
+  isOpened: boolean;
+}
+
 @inject('store', 'application')
-export default class AppWindow extends React.Component<WindowProps> {
-  
+export default class AppWindow extends React.Component<WindowProps, WindowState> {
+
   constructor(props: WindowProps) {
     super(props);
-    
+
+    this.state = { showMovement: true, isOpened: props.application.isOpened };
+
     this.onMove = this.onMove.bind(this);
     this.onResize = this.onResize.bind(this);
     this.onMaximizeToggle = this.onMaximizeToggle.bind(this);
     this.onMinimizeToggle = this.onMinimizeToggle.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+      let showMovement = false;
+      const { application : preApp = { isOpened : false } } = nextProps;
+
+      if(preApp.isOpened !== this.state.isOpened ){
+        showMovement = true;
+      }
+
+      if(this.state.showMovement !== showMovement ){
+        this.setState({showMovement, isOpened: preApp.isOpened});
+      }
   }
 
   onMove = (left: number, top: number) => {
@@ -52,8 +72,9 @@ export default class AppWindow extends React.Component<WindowProps> {
     store.toggleApplicationMinimize(application.id);
   }
 
-  getCurrentStyle = () => {
+  getCurrentStyle = (isDragging? : boolean) => {
     const { application } = this.props;
+    const { showMovement } = this.state;
 
     let { 
       x: newLeft,
@@ -62,9 +83,11 @@ export default class AppWindow extends React.Component<WindowProps> {
       height: newHeight,
     } = this.getApplicationSize();
 
+    //let config = {stiffness: 20, damping: 40};
+
     return {
-      x: newLeft,// spring(newLeft),
-      y: newTop, //spring(newTop),
+      x: showMovement ?  spring(newLeft) : newLeft,
+      y: showMovement ?  spring(newTop) : newTop,
       width: spring(newWidth),
       height: spring(newHeight),
       opacity: spring(application.isOpened ? 1 : 0),
@@ -117,7 +140,7 @@ export default class AppWindow extends React.Component<WindowProps> {
       opacity: 1,
     };
   }
-  
+
   public render() {
     const {
       children,
