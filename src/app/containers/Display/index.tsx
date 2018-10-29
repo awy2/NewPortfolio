@@ -5,9 +5,12 @@ import { observable } from 'mobx';
 
 import AppWindow from 'components/AppWindow';
 import AppBar from 'components/AppBar';
+import Terminal from 'components/Terminal';
 
-import { ApplicationStore } from 'app/stores';
-import { STORE_APPLICATION } from 'app/constants';
+import { ApplicationStore, TerminalStore } from 'app/stores';
+import { STORE_APPLICATION, STORE_TERMINAL } from 'app/constants';
+
+import * as applicationTypes from 'constants/applicationTypes';
 
 // const update = require('immutability-helper');
 
@@ -21,10 +24,11 @@ const styles: React.CSSProperties = {
 export interface DisplayProps {
 }
 
-@inject(STORE_APPLICATION)
+@inject(STORE_APPLICATION, STORE_TERMINAL)
 @observer
 export class Display extends React.Component<DisplayProps> {
   @observable applications =  this.props[STORE_APPLICATION] as ApplicationStore;
+  @observable terminals =  this.props[STORE_TERMINAL] as TerminalStore;
 
   constructor(props: DisplayProps) {
     super(props);
@@ -43,17 +47,32 @@ export class Display extends React.Component<DisplayProps> {
   public render() {
 
     const applicationStore = this.props[STORE_APPLICATION] as ApplicationStore;
+    const terminalStore = this.props[STORE_TERMINAL] as TerminalStore;
+
     return (
       <Provider store={applicationStore}>
           <div style={styles}>
 
-            {applicationStore.applications.map((apps) => {
-              const { id, text } = apps;
+            {applicationStore.applications.map((app) => {
+              const { id, text } = app;
+              let appComponent = <div>{text}</div>;
+              let terminal = null;
+
+              switch(app.applicationType){
+                case applicationTypes.Terminal:
+                  terminal = terminalStore.terminals.filter( terminal => terminal.appID === app.id )[0];
+
+                  appComponent = (
+                  <Provider key={id} terminalStore={terminalStore} terminal={terminal}>
+                    <Terminal />
+                  </Provider>);
+                break;
+              }
 
               return (
-                <Provider key={id} application={apps}>
+                <Provider key={id} application={app}>
                     <AppWindow key={id}>
-                      {text}
+                      {appComponent}
                     </AppWindow>
                 </Provider>
               );

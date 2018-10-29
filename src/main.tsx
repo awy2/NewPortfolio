@@ -8,6 +8,7 @@ import { createStores } from 'app/stores';
 import { App } from 'app';
 import { initializeIcons } from '@uifabric/icons';
 import { Fabric } from 'office-ui-fabric-react/lib/Fabric';
+import { Terminal } from 'constants/applicationTypes';
 
 initializeIcons();
 
@@ -23,6 +24,7 @@ const defaultApplication = [
     left: 100,
     height: 100,
     width: 200,
+    applicationType: Terminal,
   }),
 ];
 

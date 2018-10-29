@@ -1,6 +1,8 @@
 import { observable, computed, action } from 'mobx';
 import { ApplicationModel } from 'app/models';
 
+import { Test } from 'constants/applicationTypes';
+
 export class ApplicationStore {
   @observable public applications: ApplicationModel[];
   lastTop: number;
@@ -57,6 +59,7 @@ export class ApplicationStore {
       height: item.height,
       width: item.width,
       sequence: this.lastSequence,
+      applicationType: Test,
     });
 
     this.lastSelectedApplicationID = newApp.id;

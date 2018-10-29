@@ -20,7 +20,8 @@
       "app/*": ["./app/*"],
       "components/*": ["./app/components/*"],
       "stores/*": ["./app/stores/*"],
-      "models/*": ["./app/models/*"]
+      "models/*": ["./app/models/*"],
+      "constants/*": ["./app/constants/*"]
     }
   },
   "exclude": ["dist", 

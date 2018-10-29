@@ -9,6 +9,7 @@ interface IApplicationModel {
   left: number;
   height: number;
   width: number;
+  applicationType: symbol;
 }
 
 export class ApplicationModel {
@@ -24,6 +25,7 @@ export class ApplicationModel {
   public left: number;
   public height: number;
   public width: number;
+  public applicationType: symbol;
 
   constructor(obj: IApplicationModel) {
 
@@ -38,6 +40,7 @@ export class ApplicationModel {
     this.left = obj.left;
     this.height = obj.height;
     this.width = obj.width;
+    this.applicationType = obj.applicationType;
   }
 
   getTaskbarID = (): string => {
