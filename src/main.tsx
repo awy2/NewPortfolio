@@ -2,7 +2,6 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { useStrict } from 'mobx';
 import { Provider } from 'mobx-react';
-import { createBrowserHistory } from 'history';
 import { ApplicationModel } from 'app/models';
 import { createStores } from 'app/stores';
 import { App } from 'app';
@@ -29,14 +28,13 @@ const defaultApplication = [
 ];
 
 // prepare MobX stores
-const history = createBrowserHistory();
-const rootStore = createStores(history, defaultApplication);
+const rootStore = createStores(defaultApplication);
 
 // render react DOM
 ReactDOM.render(
   <Provider {...rootStore}>
     <Fabric>
-      <App history={history} />
+      <App />
     </Fabric>
   </Provider>,
   document.getElementById('root'),

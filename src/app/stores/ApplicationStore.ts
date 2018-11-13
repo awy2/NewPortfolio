@@ -1,7 +1,7 @@
 import { observable, computed, action } from 'mobx';
 import { ApplicationModel } from 'app/models';
 
-import { Test } from 'constants/applicationTypes';
+import * as applicationTypes from 'constants/applicationTypes';
 
 export class ApplicationStore {
   @observable public applications: ApplicationModel[];
@@ -16,6 +16,10 @@ export class ApplicationStore {
     this.lastLeft = 100;
     this.lastSequence = 1;
     this.lastSelectedApplicationID = null;
+  }
+
+  getByApplicationType(type: Symbol){
+    return this.applications.filter(application => application.applicationType === type)
   }
 
   @computed
@@ -59,7 +63,7 @@ export class ApplicationStore {
       height: item.height,
       width: item.width,
       sequence: this.lastSequence,
-      applicationType: Test,
+      applicationType: applicationTypes.Terminal,
     });
 
     this.lastSelectedApplicationID = newApp.id;

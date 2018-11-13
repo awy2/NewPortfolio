@@ -1,28 +1,41 @@
-import { observable, action } from 'mobx';
+import { observable, action, reaction } from 'mobx';
 import { TerminalInputModel, TerminalAppModel } from 'app/models';
 import { ApplicationStore } from 'app/stores';
+import { ApplicationModel } from 'app/models';
+import * as applicationTypes from 'constants/applicationTypes';
 
 export class TerminalStore {
   @observable public terminals: TerminalAppModel[];
   
-  
-  // TODO delete from terminal array when data is remove from app store
-  @observable applicationStore: ApplicationStore;
-
   constructor(appStore: ApplicationStore, defaultData?: TerminalAppModel[], ) {
     this.terminals = defaultData ? defaultData: [];
 
-    // TODO delete from terminal array when data is remove from app store
-    this.applicationStore = appStore;
+    reaction(
+      () => appStore.applications.length,
+      () => { this.updateTerminalStore(appStore.getByApplicationType(applicationTypes.Terminal)); }
+    );
   }
 
-  @action
+  updateTerminalStore = (applications: ApplicationModel[]) => {
+    const updatedTerminalIDs = applications.map(application => application.id);
+    const existingTerminalIDs = this.terminals.map(terminal => terminal.appID);
+
+    this.terminals = this.terminals.filter(terminal => updatedTerminalIDs.includes(terminal.appID));
+
+    updatedTerminalIDs.forEach( id => {
+      if(existingTerminalIDs.includes(id) === false){
+        this.addTerminal(id);
+      }
+    });
+  }
+
+  @action //don't think I need this anymore, since updateTerminalStore does this
   addTerminal = (appID: string) => {
     const newTerminal = new TerminalAppModel(appID);
     this.terminals.push(newTerminal);
   }
 
-  @action
+  @action //don't think I need this anymore, since updateTerminalStore does this
   closeTerminal = (appID: string) => {
     this.terminals = this.terminals.filter(application => application.appID !== appID);
   }
